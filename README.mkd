@@ -2,5 +2,6 @@
 
 ## What's this?
 
-Presentation software for Vim.
-Use markdown for presentation-file.
+`presen.vim` is a presentation software on Vim.
+
+This uses Markdown syntax for the presentation files.
