@@ -64,40 +64,6 @@ function! s:Exit()
 endfunction
 
 function! s:ParseMarkdown()
-    let l:lines = getline(1,line("$"))
-    let l:pages_line = []
-    echo "Parsing..."
-
-    let i = 0
-    while i < len(l:lines)
-        echo l:lines[i]
-        if l:lines[i] =~ "^#\+"
-            echo "add"
-            call add(l:pages_line,i)
-        endif
-
-        let i += 1
-    endwhile
-
-    let i = 0
-    while i < len(l:pages_line)
-        if i+1 < len(l:pages_line)
-            let l:line = getline(l:pages_line[i]+1,l:pages_line[i+1])
-        else
-            let l:line = getline(l:pages_line[i]+1,line("$"))
-        endif
-        call add(s:pages,join(l:line,"\r\n"))
-
-        let i += 1
-    endwhile
-
-    unlet i
-
-    let s:max_page_number = len(s:pages)-1
-    echo "Parse done"
-endfunction
-
-function! s:ParseMarkdown()
     let s:pages = split(join(getline(1, '$'), "\n"), '\v(^|\n)\ze#+')
     let s:max_page_number = len(s:pages) - 1
 endfunction
