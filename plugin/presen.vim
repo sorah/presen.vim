@@ -12,39 +12,37 @@ function! s:Start()
     let s:using_presen_vim = 1
 
     setl readonly
-    s:ParseMarkdown()
+    call s:ParseMarkdown()
     setl noreadonly
 
     tabe
-    setl readonly
-
-    s:ShowPage(1)
+    call s:ShowPage(1)
 
     command! -buffer PageNext call s:NextPage()
     command! -buffer PagePrev call s:PrevPage()
 
-    nnoremap <buffer> <silent> <Space>n :PageNext
-    nnoremap <buffer> <silent> <Space>p :PagePrev
+    nnoremap <buffer> <silent> <Space>n :PageNext<CR>
+    nnoremap <buffer> <silent> <Space>p :PagePrev<CR>
 
 endfunction
 
 function! s:ShowPage(page_no)
     let s:page_number = a:page_no
     execute ":normal G$vggd"
-    call append(0, s:pages[s:page_number])
+    call append(1, s:pages[s:page_number])
 endfunction
 
 function! s:NextPage()
     if s:page_number+1 <= s:max_page_number
         let s:page_number += 1
-        s:ShowPage(s:page_number)
+        call s:ShowPage(s:page_number)
     endif
 endfunction
 
 function! s:PrevPage()
     if s:page_number-1 >= 0
         let s:page_number -= 1
-        s:ShowPage(s:page_number)
+        call s:ShowPage(s:page_number)
     endif
 endfunction
 
@@ -60,7 +58,6 @@ function! s:Exit()
     unlet s:pages
     unlet s:using_presen_vim
 
-    setl noreadonly
     bdelete
 
 endfunction
@@ -71,8 +68,8 @@ function! s:ParseMarkdown()
     echo "Parsing..."
 
     let i = 0
-    while i < len(lines)
-        if "^#+" =~ lines[i]
+    while i < len(l:lines)
+        if l:lines[i] =~ "^#\+"
             call add(l:pages_line,i)
         endif
 
@@ -80,8 +77,13 @@ function! s:ParseMarkdown()
     endwhile
 
     let i = 0
-    while i < len(pages_line)
-        call add(s:pages,join(getline(pages_line[i],pages_line[i+1]-1),"\n"))
+    while i < len(l:pages_line)
+        if i+1 < len(l:pages_line)
+            let l:line = getline(l:pages_line[i],l:pages_line[i+1]-1)
+        else
+            let l:line = getline(l:pages_line[i],line("$"))
+        endif
+        call add(s:pages,join(l:line,"\r\n"))
 
         let i += 1
     endwhile
