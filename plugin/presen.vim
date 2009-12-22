@@ -1,7 +1,6 @@
 " presen.vim - presentation for vim
 
 command! StartPresentation call s:Start()
-command! ExitPresentation call s:Exit()
 
 function! s:Start()
 
@@ -16,21 +15,28 @@ function! s:Start()
     setl noreadonly
 
     tabe
-    echo s:pages
-    call s:ShowPage(1)
+    setl readonly
+    call s:ShowPage(0)
+
+    setf markdown
 
     command! -buffer PageNext call s:NextPage()
     command! -buffer PagePrev call s:PrevPage()
+    command! -buffer ExitPresentation call s:Exit()
 
     nnoremap <buffer> <silent> <Space>n :PageNext<CR>
     nnoremap <buffer> <silent> <Space>p :PagePrev<CR>
-
+    nnoremap <buffer> <silent> <Space>q :ExitPresentation<CR>
+    
+    autocmd BufWinLeave <buffer> call s:Exit()
 endfunction
 
 function! s:ShowPage(page_no)
     let s:page_number = a:page_no
+    setl noreadonly
     execute ":normal G$vggd"
-    call append(1, s:pages[s:page_number])
+    call append(0, s:pages[s:page_number])
+    setl readonly
 endfunction
 
 function! s:NextPage()
@@ -48,23 +54,17 @@ function! s:PrevPage()
 endfunction
 
 function! s:Exit()
-    delcommand PageNext
-    delcommand PagePrev
-
-    nunmap <Space>n
-    nunmap <Space>p
-
     unlet s:page_number
     unlet s:max_page_number
     unlet s:pages
     unlet s:using_presen_vim
 
-    bdelete
-
+    bdelete!
 endfunction
 
+
 function! s:ParseMarkdown()
-    let s:pages = split(join(getline(1, '$'), "\n"), '\v(^|\n)\ze#+')
+    let s:pages =  map(split(join(getline(1, '$'), "\n"), '\v(^|\n)\ze#+'), 'split(v:val, "\n")')
     let s:max_page_number = len(s:pages) - 1
 endfunction
 
