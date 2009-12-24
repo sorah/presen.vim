@@ -8,4 +8,9 @@ This uses Markdown syntax for the presentation files.
 
 ## How to Use
 
-Write later
+- Open a markdown file (ex: this file)
+- Run `:StartPresentation`
+- `<Space>n` next page `<Space>p` previous page.
+- `:ExitPresentation` to exit presentation.
+
+thanks.
