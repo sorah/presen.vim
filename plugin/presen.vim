@@ -1,18 +1,31 @@
 " presen.vim - presentation for vim
 
+if !exists('g:presen_vim_using')
+    let g:presen_vim_using = 0
+endif
+
 command! StartPresentation call s:Start()
 
 function! s:Start()
 
+    if g:presen_vim_using == 1
+        echo "presen.vim is running. please quit either presentation."
+        return
+    endif
 
     let s:page_number = 0
     let s:max_page_number = 0
     let s:pages = []
-    let s:using_presen_vim = 1
 
     setl readonly
     call s:ParseMarkdown()
     setl noreadonly
+
+    if empty(s:pages)
+        echo "No page detected!"
+        return
+    endif
+    let g:presen_vim_using = 1
 
     tabe
     setl readonly
@@ -32,6 +45,12 @@ function! s:Start()
 endfunction
 
 function! s:ShowPage(page_no)
+    if a:page_no < 0
+        return
+    endif
+    if len(s:pages) < a:page_no+1
+        return
+    endif
     let s:page_number = a:page_no
     setl noreadonly
     execute ":normal G$vggd"
@@ -54,11 +73,7 @@ function! s:PrevPage()
 endfunction
 
 function! s:Exit()
-    unlet s:page_number
-    unlet s:max_page_number
-    unlet s:pages
-    unlet s:using_presen_vim
-
+    let g:presen_vim_using = 0
     bdelete!
 endfunction
 
@@ -67,4 +82,3 @@ function! s:ParseMarkdown()
     let s:pages =  map(split(join(getline(1, '$'), "\n"), '\v(^|\n)\ze#+'), 'split(v:val, "\n")')
     let s:max_page_number = len(s:pages) - 1
 endfunction
-
